@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html lang="kk">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>EcoSense Duo — ауа мен су сапасын бақылайтын ақылды құрылғы</title>
+<meta content="EcoSense Duo: Smoke Off (ауа) және AquaScan (су) — ESP32 негізіндегі IoT прототиптер. Нақты уақыттағы мониторинг, апталық талдау, зерттеу және болашақ жоспар." name="description"/>
+<meta content="EcoSense Duo" property="og:title"/>
+<meta content="Таза қала сенен басталады, ақылды қала — нақты деректен." property="og:description"/>
+<meta content="#061018" name="theme-color"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;circle cx='16' cy='16' r='14' fill='%2310b981'/&gt;&lt;path d='M9 18c4-9 11-9 14-9-1 8-6 13-14 9z' fill='%23062019'/&gt;&lt;/svg&gt;" rel="icon"/>
+<link href="style.css" rel="stylesheet"/>
+<script src="chart.umd.js"></script>
+<script src="config.js"></script>
+<script src="i18n.js"></script>
+</head>
+<body>
+<div class="aurora"><i></i><i></i><i></i></div>
+<canvas id="particles"></canvas>
+<header class="top">
+<a class="brand" href="#/home">
+<svg class="logo" viewbox="0 0 40 40"><defs><lineargradient id="lg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#22d3ee"></stop></lineargradient></defs><circle cx="20" cy="20" fill="url(#lg)" r="18"></circle><path d="M11 23c5-12 14-12 18-12-1 10-8 17-18 12z" fill="#04201a"></path><path d="M12 30c3-3 8-5 13-6" fill="none" stroke="#04201a" stroke-linecap="round" stroke-width="2"></path></svg>
+<span>EcoSense <b>Duo</b></span>
+</a>
+<nav class="nav" id="nav">
+<a data-i18n="t1" data-tab="home" href="#/home">Басты</a>
+<a data-i18n="t2" data-tab="research" href="#/research">Зерттеу</a>
+<a data-i18n="t3" data-tab="prototypes" href="#/prototypes">Прототиптер</a>
+<a data-i18n="t4" data-tab="monitor" href="#/monitor">Мониторинг</a>
+<a data-i18n="t5" data-tab="charts" href="#/charts">Диаграммалар</a>
+<a data-i18n="t6" data-tab="weekly" href="#/weekly">Апталық талдау</a>
+<a data-i18n="t7" data-tab="table" href="#/table">Деректер</a>
+<a data-i18n="t8" data-tab="future" href="#/future">Болашақ</a>
+<a data-i18n="t9" data-tab="team" href="#/team">Команда</a>
+</nav>
+<div class="status"><div class="lang" id="lang"></div><span class="pill" id="mode">…</span><span class="clock" id="clock"></span></div>
+<button aria-label="Мәзір" class="burger" id="burger"><i></i><i></i><i></i></button>
+</header>
+<main>
+<!-- ================= БАСТЫ ================= -->
+<section class="view active" id="home">
+<div class="hero">
+<div class="hero-text reveal">
+<span class="eyebrow" data-i18n="t10">Smart City · IoT · Экология</span>
+<h1 data-i18n="t11">Ауа мен суды<br/><span class="grad">көзбен көретін</span><br/>ақылды құрылғы</h1>
+<p class="lead" data-i18n="t12">EcoSense Duo — қаланың ауасы мен су көздерінің сапасын нақты уақытта өлшейтін екі мамандандырылған прототип: <b>Smoke Off</b> және <b>AquaScan</b>. Деректер ESP32 арқылы деректер базасына жіберіліп, осы сайтта бірден көрінеді.</p>
+<div class="cta">
+<a class="btn primary" data-i18n="t13" href="#/monitor">Тікелей мониторинг →</a>
+<a class="btn ghost" data-i18n="t14" href="#/research">Зерттеумен танысу</a>
+</div>
+</div>
+<div class="hero-art reveal">
+<div class="orbit">
+<div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+<div class="core"><small>LIVE</small><b data-hero="aqi">—</b><span data-i18n="t15">EcoSense индексі</span></div>
+<div class="sat s1"><small>CO₂</small><b data-v="smokeoff.co2">—</b><span>ppm</span></div>
+<div class="sat s2"><small>pH</small><b data-v="aquascan.ph">—</b><span data-i18n="t16">су</span></div>
+<div class="sat s3"><small data-i18n="t17">Лайлылық</small><b data-v="aquascan.turbidity">—</b><span>NTU</span></div>
+<div class="sat s4"><small data-i18n="t18">Ауа</small><b data-v="smokeoff.temp">—</b><span>°C</span></div>
+</div>
+</div>
+</div>
+<div class="ticker"><div class="track" id="ticker"></div></div>
+<div class="duo">
+<a class="duo-card air reveal" data-tl="g" href="#/prototypes">
+<div class="art"><svg class="dev-smoke" viewbox="0 0 200 160"><use href="#svg-smoke"></use></svg></div>
+<div><span class="tag" data-i18n="t19">01 · Ауа</span><h3>Smoke Off</h3><p data-i18n="t20">Көмірқышқыл газ (CO₂), температура және ылғалдылық. Бағдаршам принципі: жасыл — таза, сары — назар, қызыл — қауіп.</p></div>
+</a>
+<a class="duo-card water reveal" href="#/prototypes">
+<div class="art"><svg class="dev-boat" viewbox="0 0 200 160"><use href="#svg-boat"></use></svg></div>
+<div><span class="tag" data-i18n="t21">02 · Су</span><h3>AquaScan</h3><p data-i18n="t22">Судың лайлылығы (Turbidity), pH және су температурасы. Су бетінде жүзетін мобильді «су патрулі».</p></div>
+</a>
+</div>
+<div class="numbers">
+<div class="num reveal"><b data-count="2">0</b><span data-i18n="t23">мамандандырылған прототип</span></div>
+<div class="num reveal"><b data-count="6">0</b><span data-i18n="t24">өлшенетін көрсеткіш</span></div>
+<div class="num reveal"><b data-count="5" data-suffix=" с">0</b><span data-i18n="t25">деректің жаңару жиілігі</span></div>
+<div class="num reveal"><b data-count="24" data-suffix="/7">0</b><span data-i18n="t26">үздіксіз бақылау</span></div>
+</div>
+<blockquote class="quote reveal" data-i18n="t27">«Таза қала сенен басталады…<br/>ал ақылды қала — <span class="grad">нақты деректен</span>.»</blockquote>
+</section>
+<!-- ================= ЗЕРТТЕУ ================= -->
+<section class="view" id="research">
+<div class="sec-head reveal"><span class="eyebrow" data-i18n="t28">Зерттеу</span><h2 data-i18n="t29">Мәселе → Болжам → Шешім → Нәтиже</h2><p data-i18n="t30">Жобаның ғылыми негізі: неге қаладағы экологиялық бақылау кешігеді және оны қалай жылдамдатуға болады.</p></div>
+<h3 class="step-title reveal" data-i18n="t31"><i>1</i>Мәселе</h3>
+<div class="grid2">
+<div class="card problem water reveal">
+<div class="badge warn">DATA FLOW: DELAYED</div>
+<h4 data-i18n="t32">Су — «соқыр аймақ»</h4>
+<p data-i18n="t33">Су сынамалары зертханада қолмен тексеріледі. Ластану көбіне зиян келіп болғаннан кейін ғана тіркеледі — нәтиже күндер, тіпті апталар өткен соң келеді.</p>
+</div>
+<div class="card problem air reveal">
+<div class="badge bad" data-i18n="t34">&gt; 2 000 000 тонна</div>
+<h4 data-i18n="t35">Ауа — кешігу қаупі</h4>
+<p data-i18n="t36">Қазақстанда жыл сайын атмосфераға 2 миллион тоннадан астам зиянды зат шығарылады. Стационарлық бекеттер аз әрі қымбат, сондықтан жағдай өзгергенде кеш әрекет етеді.</p>
+</div>
+</div>
+<h3 class="step-title reveal" data-i18n="t37"><i>2</i>Болжам: мамандандыру &gt; әмбебаптық</h3>
+<div class="card reveal">
+<p class="muted" data-i18n="t38">Бір әмбебап құрылғының орнына әр ортаға арналған шағын, арзан, мамандандырылған прототиптер тиімдірек болады деп болжадық.</p>
+<div class="tablewrap"><table class="compare">
+<thead><tr><th data-i18n="t39">Критерий</th><th data-i18n="t40">Әмбебап жүйе</th><th>EcoSense Duo</th></tr></thead>
+<tbody>
+<tr><td data-i18n="t41">Іске қосу жылдамдығы</td><td class="r" data-i18n="t42">Жобалауға айлар кетеді</td><td class="g" data-i18n="t43">Модульдік, жылдам іске қосу</td></tr>
+<tr><td data-i18n="t44">Бейімделу</td><td class="r" data-i18n="t45">Күрделі стационарлық калибрлеу</td><td class="g" data-i18n="t46">Су мен ауаға дәл бейімделген</td></tr>
+<tr><td data-i18n="t47">Деректің түсініктілігі</td><td class="r" data-i18n="t48">Күрделі ғылыми графиктер</td><td class="g" data-i18n="t49">Бағдаршам түстері мен қарапайым панель</td></tr>
+<tr><td data-i18n="t50">Құны</td><td class="r" data-i18n="t51">Жоғары</td><td class="g" data-i18n="t52">Арзан ESP32 платформасы</td></tr>
+</tbody>
+</table></div>
+</div>
+<h3 class="step-title reveal" data-i18n="t53"><i>3</i>Аппараттық эволюция</h3>
+<div class="evo reveal">
+<div class="card"><span class="tag" data-i18n="t54">1-кезең</span><h4>Arduino · MVP</h4><p data-i18n="t55">Жергілікті тестілеу. Арзан әрі қолжетімді, бірақ сымсыз байланысы жоқ — деректер тек компьютерде қалады.</p></div>
+<div class="arrow">➜</div>
+<div class="card hl"><span class="tag" data-i18n="t56">2-кезең</span><h4 data-i18n="t57">ESP32 · бұлтқа тікелей</h4><p data-i18n="t58">Жылдам өңдеу, кіріктірілген Wi-Fi және Bluetooth. Қосымша байланыс модулінсіз деректер бұлтқа және осы сайтқа жетеді.</p></div>
+</div>
+<h3 class="step-title reveal" data-i18n="t59"><i>4</i>Стресс-тест</h3>
+<div class="grid2">
+<div class="card reveal"><h4 data-i18n="t60">Ауа сынағы</h4><p data-i18n="t61">Жасанды химиялық газ шашылғанда Smoke Off оны бірден анықтап, бағдаршамды қызылға ауыстырды.</p><div class="mini-bar"><span class="r" style="--w:92%"></span></div><small class="muted" data-i18n="t62">Реакция: секундтан аз</small></div>
+<div class="card reveal"><h4 data-i18n="t63">Су сынағы</h4><p data-i18n="t64">Таза су мен лай су салынған ыдыстарда AquaScan лайлылық индексін 0-ден (таза) 299-ға (қатты ластанған) дейін бақылады.</p><div class="mini-bar"><span class="grad-bar" style="--w:100%"></span></div><small class="muted" data-i18n="t65">Шкала: 0 → 299</small></div>
+</div>
+<h3 class="step-title reveal" data-i18n="t66"><i>5</i>Нәтиже: кідіріссіз телеметрия</h3>
+<div class="grid3">
+<div class="card feat reveal"><div class="ico">₸</div><h4 data-i18n="t67">Қолжетімділік</h4><p data-i18n="t68">Арзан ESP32 жабдығы орналастыру шығынын бірнеше есе азайтады.</p></div>
+<div class="card feat reveal"><div class="ico">⚡</div><h4 data-i18n="t69">Жылдамдық</h4><p data-i18n="t70">Деректер секунд сайын жаңарады — айлық тексерулердің орнын толық басады.</p></div>
+<div class="card feat reveal"><div class="ico">⬡</div><h4 data-i18n="t71">Практикалылық</h4><p data-i18n="t72">Модульдік дизайн: өнеркәсіп мұржасына да, жүзгіш буйға да оңай орнатылады.</p></div>
+</div>
+</section>
+<!-- ================= ПРОТОТИПТЕР ================= -->
+<section class="view" id="prototypes">
+<div class="sec-head reveal"><span class="eyebrow" data-i18n="t73">Аппараттық бөлім</span><h2 data-i18n="t74">Екі прототип — бір экожүйе</h2><p data-i18n="t75">Екеуі де ESP32 платформасында жасалған және деректерді Wi-Fi арқылы сайттың деректер базасына жібереді.</p></div>
+<article class="proto reveal">
+<div class="proto-art air" data-tl="g"><svg viewbox="0 0 200 160"><use href="#svg-smoke"></use></svg>
+<div class="tl-demo" id="tlDemo"><button data-i18n="t76" data-l="g">Таза</button><button data-i18n="t77" data-l="y">Орташа</button><button data-i18n="t78" data-l="r">Ластанған</button></div>
+</div>
+<div class="proto-body">
+<span class="tag" data-i18n="t79">01 · Ауа сапасы</span>
+<h3 data-i18n="t80">Smoke Off — көрінбейтінді көрінетін ету</h3>
+<p data-i18n="t81">Ауадағы көмірқышқыл газының мөлшерін, температура мен ылғалдылықты өлшейді. Нәтижені бағдаршам түсімен көрсетеді — кез келген адам бір қарағанда түсінеді.</p>
+<div class="sensors">
+<div><b data-i18n="t82">CO₂ датчигі</b><span data-i18n="t83">көмірқышқыл газ, ppm</span></div>
+<div><b data-i18n="t84">Температура</b><span data-i18n="t85">ауа, °C</span></div>
+<div><b data-i18n="t86">Ылғалдылық</b><span data-i18n="t87">салыстырмалы, %</span></div>
+<div><b>ESP32 S2</b><span data-i18n="t88">Wi-Fi · бұлт</span></div>
+</div>
+<ul class="levels">
+<li data-i18n="t89"><i class="g"></i><b>Жасыл</b> — ауа таза, деңгей қалыпты (CO₂ ≤ <span data-th="co2good"></span> ppm)</li>
+<li data-i18n="t90"><i class="y"></i><b>Сары</b> — ескерту, бақылау қажет (≤ <span data-th="co2warn"></span> ppm)</li>
+<li data-i18n="t91"><i class="r"></i><b>Қызыл</b> — қауіпті деңгей, автоматты экоәрекет</li>
+</ul>
+</div>
+</article>
+<article class="proto rev reveal">
+<div class="proto-art water"><svg viewbox="0 0 200 160"><use href="#svg-boat"></use></svg></div>
+<div class="proto-body">
+<span class="tag" data-i18n="t92">02 · Су сапасы</span>
+<h3 data-i18n="t93">AquaScan — мобильді су патрулі</h3>
+<p data-i18n="t94">3D-принтерде басылған шағын қайық. Су бетінде жүзіп, үздіксіз өлшеу жүргізеді және деректерді бұлтқа жібереді — кешігетін зертханалық талдауларды алмастырады.</p>
+<div class="sensors">
+<div><b>Turbidity</b><span data-i18n="t95">лайлылық, NTU</span></div>
+<div><b>pH</b><span data-i18n="t96">қышқылдық-сілтілік</span></div>
+<div><b>DS18B20</b><span data-i18n="t97">су температурасы, °C</span></div>
+<div><b>ESP32 S2</b><span data-i18n="t98">Wi-Fi · бұлт</span></div>
+</div>
+<ul class="levels">
+<li data-i18n="t99"><i class="g"></i><b>pH <span data-th="phmin"></span>–<span data-th="phmax"></span></b> — ауыз су мен табиғи су көздерінің нормасы</li>
+<li data-i18n="t100"><i class="y"></i><b>Лайлылық ≤ <span data-th="turbwarn"></span> NTU</b> — орташа, бақылау қажет</li>
+<li data-i18n="t101"><i class="r"></i><b>Одан жоғары</b> — қатты ластану белгісі</li>
+</ul>
+</div>
+</article>
+<div class="card reveal">
+<h3 class="center" data-i18n="t102">Деректер қалай жүреді?</h3>
+<div class="flow">
+<div class="node"><b data-i18n="t103">Датчиктер</b><span>CO₂ · T · H<br/>pH · NTU · T°</span></div><div class="pipe"><i></i></div>
+<div class="node"><b>ESP32 S2</b><span data-i18n="t104">өңдеу, сүзгілеу</span></div><div class="pipe"><i></i></div>
+<div class="node"><b>Wi-Fi</b><span data-i18n="t105">әр 5 секунд</span></div><div class="pipe"><i></i></div>
+<div class="node"><b data-i18n="t106">Firebase база</b><span data-i18n="t107">деректер сақталады</span></div><div class="pipe"><i></i></div>
+<div class="node hl"><b>EcoSense Duo</b><span data-i18n="t108">сайт · талдау</span></div>
+</div>
+</div>
+</section>
+<!-- ================= МОНИТОРИНГ ================= -->
+<section class="view" id="monitor">
+<div class="sec-head reveal"><span class="eyebrow" data-i18n="t109">Нақты уақыт</span><h2 data-i18n="t110">Тікелей мониторинг</h2><p data-i18n="t111">Құрылғылардан келіп жатқан соңғы көрсеткіштер. Бет өздігінен жаңарады.</p></div>
+<div class="grid2">
+<article class="device" id="dev-smokeoff">
+<header><div><span class="tag" data-i18n="t112">Ауа</span><h3>Smoke Off</h3><p class="place" data-place="smokeoff"></p></div><div class="light" data-light="smokeoff"><i></i><i></i><i></i></div></header>
+<div class="metrics">
+<div class="metric"><label>CO₂</label><b data-v="smokeoff.co2">—</b><small>ppm</small></div>
+<div class="metric"><label data-i18n="t113">Температура</label><b data-v="smokeoff.temp">—</b><small>°C</small></div>
+<div class="metric"><label data-i18n="t114">Ылғалдылық</label><b data-v="smokeoff.hum">—</b><small>%</small></div>
+</div>
+<div class="gauge"><div class="gfill" data-gauge="smokeoff"></div></div>
+<footer><span class="state" data-state="smokeoff"></span><span data-time="smokeoff">—</span></footer>
+<div class="spark"><canvas id="spark-smokeoff"></canvas></div>
+</article>
+<article class="device" id="dev-aquascan">
+<header><div><span class="tag" data-i18n="t115">Су</span><h3>AquaScan</h3><p class="place" data-place="aquascan"></p></div><div class="light" data-light="aquascan"><i></i><i></i><i></i></div></header>
+<div class="metrics">
+<div class="metric"><label data-i18n="t116">Лайлылық</label><b data-v="aquascan.turbidity">—</b><small>NTU</small></div>
+<div class="metric"><label>pH</label><b data-v="aquascan.ph">—</b><small> </small></div>
+<div class="metric"><label data-i18n="t117">Су темп.</label><b data-v="aquascan.wtemp">—</b><small>°C</small></div>
+</div>
+<div class="gauge"><div class="gfill" data-gauge="aquascan"></div></div>
+<footer><span class="state" data-state="aquascan"></span><span data-time="aquascan">—</span></footer>
+<div class="spark"><canvas id="spark-aquascan"></canvas></div>
+</article>
+</div>
+<div class="legend"><span data-i18n="t118"><i class="g"></i>Таза — норма</span><span data-i18n="t119"><i class="y"></i>Орташа — бақылау қажет</span><span data-i18n="t120"><i class="r"></i>Ластанған — қауіпті деңгей</span></div>
+</section>
+<!-- ================= ДИАГРАММАЛАР ================= -->
+<section class="view" id="charts">
+<div class="toolbar"><h2 data-i18n="t121">Smoke Off — ауа <small data-place="smokeoff"></small></h2>
+<div class="range" data-dev="smokeoff"><button data-h="1" data-i18n="t122">1 сағ</button><button class="active" data-h="24" data-i18n="t123">24 сағ</button><button data-h="168" data-i18n="t124">7 күн</button></div></div>
+<div class="charts three">
+<div class="card"><h4>CO₂, ppm</h4><canvas id="ch-smokeoff-co2"></canvas></div>
+<div class="card"><h4 data-i18n="t125">Температура, °C</h4><canvas id="ch-smokeoff-temp"></canvas></div>
+<div class="card"><h4 data-i18n="t126">Ылғалдылық, %</h4><canvas id="ch-smokeoff-hum"></canvas></div>
+</div>
+<div class="toolbar mt"><h2 data-i18n="t127">AquaScan — су <small data-place="aquascan"></small></h2>
+<div class="range" data-dev="aquascan"><button data-h="1" data-i18n="t128">1 сағ</button><button class="active" data-h="24" data-i18n="t129">24 сағ</button><button data-h="168" data-i18n="t130">7 күн</button></div></div>
+<div class="charts three">
+<div class="card"><h4 data-i18n="t131">Лайлылық, NTU</h4><canvas id="ch-aquascan-turbidity"></canvas></div>
+<div class="card"><h4>pH</h4><canvas id="ch-aquascan-ph"></canvas></div>
+<div class="card"><h4 data-i18n="t132">Су температурасы, °C</h4><canvas id="ch-aquascan-wtemp"></canvas></div>
+</div>
+</section>
+<!-- ================= АПТАЛЫҚ ТАЛДАУ ================= -->
+<section class="view" id="weekly">
+<div class="toolbar"><h2 data-i18n="t133">Соңғы 7 күннің талдауы</h2><span class="muted" id="weekRange"></span></div>
+<div class="scores">
+<div class="score card"><label data-i18n="t134">Ауа сапасы индексі</label><div class="ring-score"><svg viewbox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15.9"></circle><circle class="fg" cx="18" cy="18" id="ringAir" r="15.9"></circle></svg><b id="scoreAir">—</b></div><small data-i18n="t135">уақыттың қанша пайызы нормада</small></div>
+<div class="score card"><label data-i18n="t136">Су сапасы индексі</label><div class="ring-score"><svg viewbox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15.9"></circle><circle class="fg" cx="18" cy="18" id="ringWater" r="15.9"></circle></svg><b id="scoreWater">—</b></div><small data-i18n="t137">уақыттың қанша пайызы нормада</small></div>
+<div class="score card"><label data-i18n="t138">Өлшеулер саны</label><b class="big" id="countAll">—</b><small id="countSplit"></small></div>
+</div>
+<div class="card"><h4 data-i18n="t139">Автоматты қорытынды</h4><ul class="insights" id="insights"></ul></div>
+<div class="charts two">
+<div class="card"><h4 data-i18n="t140">CO₂ — күндік орташа / максимум</h4><canvas id="wk-co2"></canvas></div>
+<div class="card"><h4 data-i18n="t141">Лайлылық — күндік орташа / максимум</h4><canvas id="wk-turbidity"></canvas></div>
+<div class="card"><h4 data-i18n="t142">pH — күндік орташа</h4><canvas id="wk-ph"></canvas></div>
+<div class="card"><h4 data-i18n="t143">Температура — ауа және су</h4><canvas id="wk-temp"></canvas></div>
+</div>
+<div class="card"><h4 data-i18n="t144">Көрсеткіштер бойынша кесте</h4>
+<div class="tablewrap"><table id="statTable"><thead><tr><th data-i18n="t145">Көрсеткіш</th><th data-i18n="t146">Орташа</th><th data-i18n="t147">Мин</th><th data-i18n="t148">Макс</th><th data-i18n="t149">Нормадан тыс</th><th data-i18n="t150">Үрдіс</th></tr></thead><tbody></tbody></table></div>
+</div>
+</section>
+<!-- ================= ДЕРЕКТЕР ================= -->
+<section class="view" id="table">
+<div class="toolbar"><h2 data-i18n="t151">Барлық өлшеулер (7 күн)</h2>
+<div class="range" id="tableDev"><button class="active" data-d="smokeoff">Smoke Off</button><button data-d="aquascan">AquaScan</button></div>
+<button class="btn ghost" data-i18n="t152" id="csv">CSV (Excel) жүктеу</button></div>
+<div class="card"><div class="tablewrap tall"><table id="dataTable"><thead></thead><tbody></tbody></table></div></div>
+</section>
+<!-- ================= БОЛАШАҚ ================= -->
+<section class="view" id="future">
+<div class="sec-head reveal"><span class="eyebrow" data-i18n="t153">Даму жоспары</span><h2 data-i18n="t154">Болашаққа жоспар</h2><p data-i18n="t155">EcoSense Duo — бастамасы ғана. Келесі қадамдарымыз:</p></div>
+<div class="roadmap">
+<div class="rm done reveal"><span class="when" data-i18n="t156">Жасалды</span><h4 data-i18n="t157">Прототиптер + бұлт</h4><p data-i18n="t158">Smoke Off және AquaScan жиналды, ESP32 арқылы деректер базасына қосылды, осы сайт іске қосылды.</p></div>
+<div class="rm now reveal"><span class="when" data-i18n="t159">Қазір</span><h4 data-i18n="t160">Далалық сынақ және калибрлеу</h4><p data-i18n="t161">Мектеп ауласы мен су көздерінде ұзақ мерзімді өлшеулер, датчиктерді эталонмен салыстыру.</p></div>
+<div class="rm reveal"><span class="when" data-i18n="t162">Келесі кезең</span><h4 data-i18n="t163">Ескерту жүйесі</h4><p data-i18n="t164">Қауіпті деңгейде Telegram-бот пен SMS арқылы жедел хабарлама; құрылғыда дыбыстық белгі.</p></div>
+<div class="rm reveal"><span class="when" data-i18n="t165">Келесі кезең</span><h4 data-i18n="t166">Жаңа датчиктер</h4><p data-i18n="t167">Ауаға PM2.5/PM10 шаң бөлшектері, суға еріген оттегі (DO) және электр өткізгіштік (TDS) датчиктері.</p></div>
+<div class="rm reveal"><span class="when" data-i18n="t168">Болашақ</span><h4 data-i18n="t169">Күн энергиясы және автономия</h4><p data-i18n="t170">Күн панелі мен аккумулятор; AquaScan-ға GPS және белгіленген маршрутпен автономды жүзу.</p></div>
+<div class="rm reveal"><span class="when" data-i18n="t171">Болашақ</span><h4 data-i18n="t172">Қала картасы</h4><p data-i18n="t173">Ондаған құрылғыдан жиналған деректер интерактивті картада: қаланың «экологиялық жылу картасы».</p></div>
+<div class="rm reveal"><span class="when" data-i18n="t174">Болашақ</span><h4 data-i18n="t175">Жасанды интеллект болжамы</h4><p data-i18n="t176">Жиналған тарих бойынша ластанудың келесі күнгі деңгейін болжайтын машиналық оқыту моделі.</p></div>
+</div>
+<div class="sec-head reveal mt"><span class="eyebrow" data-i18n="t177">Нарық</span><h2 data-i18n="t178">Кімге арналған?</h2></div>
+<div class="grid3">
+<div class="card feat reveal"><div class="ico">B2B</div><h4 data-i18n="t179">Жеке мектептер мен STEM зертханалар</h4><p data-i18n="t180">EdTech интеграциясы: оқушылар нақты экологиялық деректермен зерттеу жүргізеді.</p></div>
+<div class="card feat reveal"><div class="ico">B2G</div><h4 data-i18n="t181">Мемлекеттік мектептер мен әкімдіктер</h4><p data-i18n="t182">Қала инфрақұрылымына енгізу: аулалар, саябақтар, өзендер мен көлдер мониторингі.</p></div>
+<div class="card feat reveal"><div class="ico">₸</div><h4 data-i18n="t183">Табыс көздері</h4><p data-i18n="t184">Құрылғыларды сату · орнату және оқыту · тұрақты сервистік келісімшарттар.</p></div>
+</div>
+</section>
+<!-- ================= КОМАНДА ================= -->
+<section class="view" id="team">
+<div class="sec-head reveal"><span class="eyebrow" data-i18n="t185">Біз туралы</span><h2 data-i18n="t186">Команда</h2><p data-i18n="t187">EcoSense Duo — оқушылар жасаған зерттеу жобасы.</p></div>
+<div class="team" id="teamList"></div>
+<div class="card reveal center">
+<h3 data-i18n="t188">Технологиялар</h3>
+<div class="chips"><span>ESP32 S2</span><span>Arduino IDE · C++</span><span>Firebase Realtime Database</span><span>IoT · Wi-Fi</span><span data-i18n="t190">3D-басып шығару</span><span>JavaScript · Chart.js</span></div>
+</div>
+<blockquote class="quote reveal" data-i18n="t191">«Таза қала сенен басталады…<br/>ал ақылды қала — <span class="grad">нақты деректен</span>.»</blockquote>
+</section>
+</main>
+<footer class="foot">
+<div><b>EcoSense Duo</b> · Smoke Off &amp; AquaScan · ESP32 + IoT · Firebase</div>
+<div class="muted"><span id="foot-mode"></span> · © <span id="year"></span></div>
+</footer>
+<!-- SVG иллюстрациялар -->
+<svg height="0" style="position:absolute" width="0">
+<defs>
+<lineargradient id="gBody" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e5edf5"></stop><stop offset="1" stop-color="#9fb2c6"></stop></lineargradient>
+<lineargradient id="gHull" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#22d3ee"></stop><stop offset="1" stop-color="#0e7490"></stop></lineargradient>
+<lineargradient id="gWater" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#0ea5e9" stop-opacity=".55"></stop><stop offset="1" stop-color="#0c4a6e" stop-opacity=".1"></stop></lineargradient>
+<symbol id="svg-smoke" viewbox="0 0 200 160">
+<g class="smoke-puffs"><circle cx="150" cy="40" r="10"></circle><circle cx="162" cy="26" r="13"></circle><circle cx="176" cy="12" r="9"></circle></g>
+<rect fill="url(#gBody)" height="112" rx="16" width="96" x="50" y="34"></rect>
+<rect fill="#0b1726" height="36" rx="6" width="76" x="60" y="46"></rect>
+<text fill="#34d399" font-family="monospace" font-size="9" text-anchor="middle" x="98" y="61">CO₂ 520ppm</text>
+<text fill="#7dd3fc" font-family="monospace" font-size="8" text-anchor="middle" x="98" y="74">21.4°C  46%</text>
+<rect fill="#0b1726" height="48" rx="8" width="28" x="84" y="90"></rect>
+<circle class="tl-r" cx="98" cy="102" r="5"></circle><circle class="tl-y" cx="98" cy="114" r="5"></circle><circle class="tl-g" cx="98" cy="126" r="5"></circle>
+<g stroke="#7b8ea4" stroke-linecap="round" stroke-width="2.5"><line x1="62" x2="76" y1="96" y2="96"></line><line x1="62" x2="76" y1="104" y2="104"></line><line x1="62" x2="76" y1="112" y2="112"></line><line x1="120" x2="134" y1="96" y2="96"></line><line x1="120" x2="134" y1="104" y2="104"></line><line x1="120" x2="134" y1="112" y2="112"></line></g>
+<line stroke="#cbd5e1" stroke-linecap="round" stroke-width="3" x1="132" x2="140" y1="34" y2="10"></line><circle cx="140" cy="9" fill="#34d399" r="4"></circle>
+<g class="wifi" fill="none" stroke="#34d399" stroke-linecap="round" stroke-width="2"><path d="M28 40a18 18 0 0 1 22-10"></path><path d="M34 46a10 10 0 0 1 12-6"></path></g>
+</symbol>
+<symbol id="svg-boat" viewbox="0 0 200 160">
+<rect fill="url(#gWater)" height="60" width="200" x="0" y="100"></rect>
+<path class="wave" d="M0 100 Q25 92 50 100 T100 100 T150 100 T200 100 T250 100 T300 100" fill="none" stroke="#67e8f9" stroke-width="2"></path>
+<g class="bob">
+<path d="M30 88 L170 88 L150 112 L48 112 Z" fill="url(#gHull)"></path>
+<rect fill="url(#gBody)" height="28" rx="8" width="60" x="70" y="62"></rect>
+<rect fill="#0b1726" height="12" rx="3" width="18" x="78" y="68"></rect><rect fill="#0b1726" height="12" rx="3" width="18" x="102" y="68"></rect>
+<text fill="#e0f2fe" font-family="sans-serif" font-size="9" font-weight="700" text-anchor="middle" x="100" y="105">AquaScan</text>
+<line stroke="#cbd5e1" stroke-linecap="round" stroke-width="3" x1="122" x2="128" y1="62" y2="36"></line><circle cx="128" cy="35" fill="#22d3ee" r="4"></circle>
+<g stroke="#94a3b8" stroke-width="3"><line x1="70" x2="70" y1="112" y2="136"></line><line x1="100" x2="100" y1="112" y2="140"></line><line x1="130" x2="130" y1="112" y2="136"></line></g>
+<circle cx="70" cy="138" fill="#10b981" r="4"></circle><circle cx="100" cy="142" fill="#f59e0b" r="4"></circle><circle cx="130" cy="138" fill="#38bdf8" r="4"></circle>
+<g class="wifi" fill="none" stroke="#22d3ee" stroke-linecap="round" stroke-width="2"><path d="M140 30a16 16 0 0 1 16 6"></path><path d="M138 22a26 26 0 0 1 26 10"></path></g>
+</g>
+<g class="bubbles" fill="#a5f3fc"><circle cx="64" cy="150" r="2"></circle><circle cx="106" cy="152" r="1.6"></circle><circle cx="136" cy="150" r="2.2"></circle></g>
+</symbol>
+</defs>
+</svg>
+<script src="app.js" type="module"></script>
+</body>
+</html>
